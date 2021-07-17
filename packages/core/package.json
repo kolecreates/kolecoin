@@ -1,0 +1,25 @@
+{
+  "name": "@kolecoin/core",
+  "version": "0.0.0",
+  "description": "Common logic and definitions used by the other modules.",
+  "author": "KoleCreates",
+  "homepage": "",
+  "license": "MIT",
+  "main": "lib/core.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.yarnpkg.com"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "eslint-plugin-jsx-a11y": "^6.4.1"
+  }
+}
