@@ -1,26 +1,16 @@
 const crypto = require('crypto');
 const eccrypto = require('eccrypto');
-const { ADDRESS_PREFIX } = require('./constants');
 
-const isAddress = (addr) => {
+const isPublicKey = (addr) => {
   if (typeof addr !== 'string') {
     return false;
   }
 
-  if (addr.length !== 42) {
-    return false;
-  }
-
-  if (addr.slice(0, 2) !== ADDRESS_PREFIX) {
+  if (addr.length !== 130) {
     return false;
   }
 
   return true;
-};
-
-const publicKeyToAddress = (publicKey) => {
-  const hash = crypto.createHash('sha256').update(publicKey, 'hex').digest('hex');
-  return `${ADDRESS_PREFIX}${hash.slice(hash.length - 40)}`;
 };
 
 const createWallet = () => {
@@ -32,15 +22,15 @@ const createWallet = () => {
   };
 };
 
-const signString = (str, privateKey) => {
+const signString = async (str, privateKey) => {
   const hash = crypto.createHash('sha256').update(str).digest();
-  return eccrypto.sign(Buffer.from(privateKey, 'hex'), hash);
+  return (await eccrypto.sign(Buffer.from(privateKey, 'hex'), hash)).toString('hex');
 };
 
 const isValidSignature = async (str, sig, publicKey) => {
-  const hash = crypto.createHash('sha256').update(str).digest();
   try {
-    await eccrypto.verify(Buffer.from(publicKey, 'hex'), hash, sig);
+    const hash = crypto.createHash('sha256').update(str).digest();
+    await eccrypto.verify(Buffer.from(publicKey, 'hex'), hash, Buffer.from(sig, 'hex'));
     return true;
   } catch {
     return false;
@@ -48,8 +38,7 @@ const isValidSignature = async (str, sig, publicKey) => {
 };
 
 module.exports = {
-  isAddress,
-  publicKeyToAddress,
+  isPublicKey,
   createWallet,
   signString,
   isValidSignature,

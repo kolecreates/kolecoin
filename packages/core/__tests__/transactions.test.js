@@ -10,14 +10,16 @@ const {
 const {
   DEFAULT_TRANSACTION,
   CONTRACT_CREATE_TX,
-  DEFAULT_WALLET,
+  USER_WALLET_1,
 } = require('../__mocks__/data');
 
 const contracts = require('../lib/contracts');
 
 const isContractDataSpy = jest.spyOn(contracts, 'isContractData');
 
-const { validateTxFields, signTx, isTxSignedBySender } = require('../lib/transactions');
+const {
+  validateTxFields, signTx, isTxSignedBySender, createTx,
+} = require('../lib/transactions');
 
 describe('validateTxFields', () => {
   it('returns true if valid', () => {
@@ -73,9 +75,9 @@ describe('validateTxFields', () => {
 
 describe('isTxSignedBySender & signTx', () => {
   it('identifies valid tx signatures', async () => {
-    const signature = await signTx(DEFAULT_TRANSACTION, DEFAULT_WALLET.privateKey);
+    const signature = await signTx(DEFAULT_TRANSACTION, USER_WALLET_1.privateKey);
     await expect(
-      isTxSignedBySender(DEFAULT_TRANSACTION, signature, DEFAULT_WALLET.publicKey),
+      isTxSignedBySender(DEFAULT_TRANSACTION, signature, USER_WALLET_1.publicKey),
     ).resolves.toBe(true);
   });
 
@@ -85,10 +87,10 @@ describe('isTxSignedBySender & signTx', () => {
       from: DEFAULT_TRANSACTION.to,
       to: DEFAULT_TRANSACTION.from,
     };
-    const signature = await signTx(tx, DEFAULT_WALLET.privateKey);
+    const signature = await signTx(tx, USER_WALLET_1.privateKey);
 
     await expect(
-      isTxSignedBySender(tx, signature, DEFAULT_WALLET.publicKey),
+      isTxSignedBySender(tx, signature, USER_WALLET_1.publicKey),
     ).resolves.toBe(false);
   });
 
@@ -96,15 +98,15 @@ describe('isTxSignedBySender & signTx', () => {
     const signature = await signTx({
       ...DEFAULT_TRANSACTION,
       value: 1000,
-    }, DEFAULT_WALLET.privateKey);
+    }, USER_WALLET_1.privateKey);
 
     await expect(
-      isTxSignedBySender(DEFAULT_TRANSACTION, signature, DEFAULT_WALLET.publicKey),
+      isTxSignedBySender(DEFAULT_TRANSACTION, signature, USER_WALLET_1.publicKey),
     ).resolves.toBe(false);
   });
 
   it('treats any error or missing args as invalid case', async () => {
-    const signature = await signTx(DEFAULT_TRANSACTION, DEFAULT_WALLET.privateKey);
+    const signature = await signTx(DEFAULT_TRANSACTION, USER_WALLET_1.privateKey);
     await Promise.all([
       [null, signature, DEFAULT_TRANSACTION.publicKey],
       [DEFAULT_TRANSACTION, null, DEFAULT_TRANSACTION.publicKey],
@@ -113,5 +115,19 @@ describe('isTxSignedBySender & signTx', () => {
     ].map((args) => expect(
       isTxSignedBySender(...args),
     ).resolves.toBe(false)));
+  });
+});
+
+describe('createTx', () => {
+  it('creates', () => {
+    const tx = createTx(...Object.values(DEFAULT_TRANSACTION));
+    expect(tx).toEqual(DEFAULT_TRANSACTION);
+  });
+  it('validates', () => {
+    const tx = { ...DEFAULT_TRANSACTION };
+    tx.to = null;
+    tx.data = null;
+    expect(() => createTx(...Object.values(tx)))
+      .toThrow(TX_DATA_MISSING_ERROR);
   });
 });

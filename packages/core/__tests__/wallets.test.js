@@ -1,38 +1,27 @@
 /* eslint-disable no-undef */
-const { DEFAULT_TRANSACTION, DEFAULT_WALLET } = require('../__mocks__/data');
-const { ADDRESS_PREFIX } = require('../lib/constants');
+const { DEFAULT_TRANSACTION, USER_WALLET_1 } = require('../__mocks__/data');
 const {
-  isAddress, createWallet, publicKeyToAddress, signString, isValidSignature,
+  isPublicKey, createWallet, signString, isValidSignature,
 } = require('../lib/wallets');
 
-describe('isAddress', () => {
+describe('isPublicKey', () => {
   it('returns true', () => {
-    expect(isAddress(DEFAULT_TRANSACTION.to)).toBe(true);
+    expect(isPublicKey(DEFAULT_TRANSACTION.to)).toBe(true);
   });
 
   it('type checks for string', () => {
     [undefined, null, true, 1234].forEach((val) => {
-      expect(isAddress(val)).toBe(false);
+      expect(isPublicKey(val)).toBe(false);
     });
   });
 
-  it('checks for address prefix', () => {
-    expect(isAddress(DEFAULT_TRANSACTION.to.slice(ADDRESS_PREFIX.length))).toBe(false);
-  });
-
   it('check if address is 20 bytes', () => {
-    expect(isAddress(DEFAULT_TRANSACTION.to.slice(0, -3))).toBe(false);
-  });
-});
-
-describe('publicKeyToAddress', () => {
-  it('should return correct address', () => {
-    expect(publicKeyToAddress(DEFAULT_WALLET.publicKey)).toEqual(DEFAULT_WALLET.address);
+    expect(isPublicKey(DEFAULT_TRANSACTION.to.slice(0, -3))).toBe(false);
   });
 });
 
 describe('createWallet', () => {
-  it('returns public, private, and address', () => {
+  it('returns public, private', () => {
     const wallet = createWallet();
     expect(wallet.publicKey.length).toEqual(130);
     expect(wallet.privateKey.length).toEqual(64);
@@ -42,9 +31,9 @@ describe('createWallet', () => {
 describe('signString', () => {
   const rawString = 'hello world';
   it('should return verifiable signature', async () => {
-    const signature = await signString(rawString, DEFAULT_WALLET.privateKey);
+    const signature = await signString(rawString, USER_WALLET_1.privateKey);
     await expect(
-      isValidSignature(rawString, signature, DEFAULT_WALLET.publicKey),
+      isValidSignature(rawString, signature, USER_WALLET_1.publicKey),
     ).resolves.toBe(true);
   });
 });
@@ -52,7 +41,7 @@ describe('signString', () => {
 describe('isValidSignature', () => {
   it('should return false is signature invalid', async () => {
     await expect(
-      isValidSignature('hello world', 'afdef12fefaed', DEFAULT_WALLET.publicKey),
+      isValidSignature('hello world', 'afdef12fefaed', USER_WALLET_1.publicKey),
     ).resolves.toBe(false);
   });
 });

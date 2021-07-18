@@ -10,16 +10,16 @@ const {
 } = require('./constants');
 const { isNumber } = require('./numbers');
 const {
-  isAddress, signString, isValidSignature, publicKeyToAddress,
+  isPublicKey, signString, isValidSignature,
 } = require('./wallets');
 const { isContractData } = require('./contracts');
 
 const validateTxFields = (tx) => {
-  if (!isAddress(tx.from)) {
+  if (!isPublicKey(tx.from)) {
     throw new Error(INVALID_ADDRESS_ERROR);
   }
 
-  if (!isAddress(tx.to)) {
+  if (!isPublicKey(tx.to)) {
     if (tx.data) {
       throw new Error(INVALID_ADDRESS_ERROR);
     } else {
@@ -57,7 +57,7 @@ const signTx = (tx, privateKey) => {
 
 const isTxSignedBySender = async (tx, sig, publicKey) => {
   try {
-    if (tx.from !== publicKeyToAddress(publicKey)) {
+    if (tx.from !== publicKey) {
       return false;
     }
     const txStr = JSON.stringify(tx);
@@ -67,8 +67,25 @@ const isTxSignedBySender = async (tx, sig, publicKey) => {
   }
 };
 
+const createTx = (from, to, value, nonce, data, fee, feeLimit) => {
+  const tx = {
+    from,
+    to,
+    value,
+    nonce,
+    data,
+    fee,
+    feeLimit,
+  };
+  if (validateTxFields(tx)) {
+    return tx;
+  }
+  return null;
+};
+
 module.exports = {
   validateTxFields,
   signTx,
   isTxSignedBySender,
+  createTx,
 };

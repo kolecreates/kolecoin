@@ -20,18 +20,11 @@ const isContractData = (data) => {
     if (keys.length < 1) {
       return false;
     }
-    // eslint-disable-next-line no-restricted-syntax
-    for (const k of keys) {
+    if (keys.some((k) => {
       const def = data.create[k];
-      if (!def) {
-        return false;
-      }
-      if (!Array.isArray(def.commands)) {
-        return false;
-      }
-      if (def.params && !Array.isArray(def.params)) {
-        return false;
-      }
+      return !def || !Array.isArray(def.commands) || (def.params && !Array.isArray(def.params));
+    })) {
+      return false;
     }
   } else {
     return false;
