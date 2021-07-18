@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-const { isBlockDataValid, signBlock, isBlockTrusted } = require('../lib/blockchain');
+const { isBlockDataValid, signBlock, isBlockTrusted } = require('../lib/blocks');
 const { MAX_NEW_BLOCK_AGE_MS, MAXIMUM_COIN_VALUE, MINIMUM_COIN_VALUE } = require('../lib/constants');
 const { signString } = require('../lib/wallets');
 const {
