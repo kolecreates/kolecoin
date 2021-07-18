@@ -7,8 +7,6 @@ AIE Token with Proof-of-Authority consensus written in JS.
 - Exuberance
 
 ## Components
-#### Blockchain
-Blocksize 1 second?
 #### Ledger Node
 hold the network state & share it with peers via network relayers
 #### Relay Node

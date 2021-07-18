@@ -1,6 +1,6 @@
 module.exports = {
   MAXIMUM_COIN_VALUE: 1000000000000, // trillion
-  MINIMUM_COIN_VALUE: 0.00001,
+  MINIMUM_COIN_VALUE: 0.001,
   MAXIMUM_VALUE_ERROR: 'value exceeds maximum',
   MINUMUM_VALUE_ERROR: 'value below minimum',
   NAN_VALUE_ERROR: 'value is not a number',

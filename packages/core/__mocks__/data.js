@@ -28,9 +28,24 @@ const CONTRACT_CREATE_TX = {
   ...DEFAULT_TRANSACTION,
   data: {
     create: {
-      buyNFT: {
-        params: [],
-        commands: [],
+      state: {
+        locked: false,
+        owner: null,
+        mediaUrl: 'example.com/nft_image.png',
+      },
+      functions: {
+        buyNFT: {
+          params: {},
+          logic: [
+            ['ifEqual', ['getState', 'locked'], true, ['reject']],
+            ['ifGTE', ['getTx', 'value'], ['getState', 'buyoutPrice'],
+              [
+                ['setState', ['locked', true]],
+                ['setState', ['owner', ['getTx', 'from']]],
+              ],
+            ],
+          ],
+        },
       },
     },
   },
@@ -41,7 +56,7 @@ const CONTRACT_INVOKE_TX = {
   data: {
     invoke: {
       name: 'buyNFT',
-      args: [],
+      args: {},
     },
   },
 };

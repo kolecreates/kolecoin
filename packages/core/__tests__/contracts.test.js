@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
-const { isContractData } = require('../lib/contracts');
-const { CONTRACT_CREATE_TX, CONTRACT_INVOKE_TX } = require('../__mocks__/data');
+const { isContractData, createContractAddress } = require('../lib/contracts');
+const { CONTRACT_CREATE_TX, CONTRACT_INVOKE_TX, USER_WALLET_1 } = require('../__mocks__/data');
 
 describe('isContractData', () => {
   it('returns false if not a plain object', () => {
@@ -39,5 +39,13 @@ describe('isContractData', () => {
 
   it('returns true if defining a contract', () => {
     expect(isContractData(CONTRACT_CREATE_TX.data)).toBe(true);
+  });
+});
+
+describe('createContractAddress', () => {
+  it('is reproducable', () => {
+    const address = createContractAddress(USER_WALLET_1.publicKey, CONTRACT_CREATE_TX.nonce);
+    const addressCopy = createContractAddress(USER_WALLET_1.publicKey, CONTRACT_CREATE_TX.nonce);
+    expect(address).toEqual(addressCopy);
   });
 });

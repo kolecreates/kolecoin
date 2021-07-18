@@ -1,9 +1,8 @@
-const isContractData = (data) => {
-  if (typeof data !== 'object' || data === null) {
-    return false;
-  }
+const crypto = require('crypto');
+const { isPlainObject } = require('./objects');
 
-  if (Array.isArray(data)) {
+const isContractData = (data) => {
+  if (!isPlainObject(data)) {
     return false;
   }
 
@@ -11,18 +10,21 @@ const isContractData = (data) => {
   if (keyCount > 1) {
     return false;
   }
-  if (data.invoke) {
+  if (isPlainObject(data.invoke)) {
     if (!data.invoke.args || !data.invoke.name) {
       return false;
     }
-  } else if (data.create) {
-    const keys = Object.keys(data.create);
-    if (keys.length < 1) {
+  } else if (isPlainObject(data.create)) {
+    if (!isPlainObject(data.create.state) || !isPlainObject(data.create.functions)) {
       return false;
     }
-    if (keys.some((k) => {
-      const def = data.create[k];
-      return !def || !Array.isArray(def.commands) || (def.params && !Array.isArray(def.params));
+    const funcs = Object.keys(data.create.functions);
+    if (funcs.length < 1) {
+      return false;
+    }
+    if (funcs.some((k) => {
+      const def = data.create.functions[k];
+      return !def || !Array.isArray(def.logic) || !isPlainObject(def.params);
     })) {
       return false;
     }
@@ -33,6 +35,11 @@ const isContractData = (data) => {
   return true;
 };
 
+const createContractAddress = (publicKey, nonce) => crypto.createHash('sha256')
+  .update(publicKey + nonce)
+  .digest();
+
 module.exports = {
   isContractData,
+  createContractAddress,
 };
