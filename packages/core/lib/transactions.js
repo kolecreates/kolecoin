@@ -9,7 +9,9 @@ const {
   TX_INVALID_DATA_ERROR,
 } = require('./constants');
 const { isNumber } = require('./numbers');
-const { isAddress } = require('./wallets');
+const {
+  isAddress, signString, isValidSignature, publicKeyToAddress,
+} = require('./wallets');
 const { isContractData } = require('./contracts');
 
 const validateTxFields = (tx) => {
@@ -48,6 +50,25 @@ const validateTxFields = (tx) => {
   return true;
 };
 
+const signTx = (tx, privateKey) => {
+  const txStr = JSON.stringify(tx);
+  return signString(txStr, privateKey);
+};
+
+const isTxSignedBySender = async (tx, sig, publicKey) => {
+  try {
+    if (tx.from !== publicKeyToAddress(publicKey)) {
+      return false;
+    }
+    const txStr = JSON.stringify(tx);
+    return isValidSignature(txStr, sig, publicKey);
+  } catch {
+    return false;
+  }
+};
+
 module.exports = {
   validateTxFields,
+  signTx,
+  isTxSignedBySender,
 };

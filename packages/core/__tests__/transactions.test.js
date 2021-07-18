@@ -10,13 +10,14 @@ const {
 const {
   DEFAULT_TRANSACTION,
   CONTRACT_CREATE_TX,
+  DEFAULT_WALLET,
 } = require('../__mocks__/data');
 
 const contracts = require('../lib/contracts');
 
 const isContractDataSpy = jest.spyOn(contracts, 'isContractData');
 
-const { validateTxFields } = require('../lib/transactions');
+const { validateTxFields, signTx, isTxSignedBySender } = require('../lib/transactions');
 
 describe('validateTxFields', () => {
   it('returns true if valid', () => {
@@ -67,5 +68,50 @@ describe('validateTxFields', () => {
     isContractDataSpy.mockClear();
     expect(() => validateTxFields({ ...DEFAULT_TRANSACTION, data: { hello: 'world' } })).toThrow(TX_INVALID_DATA_ERROR);
     expect(isContractDataSpy).toBeCalled();
+  });
+});
+
+describe('isTxSignedBySender & signTx', () => {
+  it('identifies valid tx signatures', async () => {
+    const signature = await signTx(DEFAULT_TRANSACTION, DEFAULT_WALLET.privateKey);
+    await expect(
+      isTxSignedBySender(DEFAULT_TRANSACTION, signature, DEFAULT_WALLET.publicKey),
+    ).resolves.toBe(true);
+  });
+
+  it('checks for sender/signer mismatch', async () => {
+    const tx = {
+      ...DEFAULT_TRANSACTION,
+      from: DEFAULT_TRANSACTION.to,
+      to: DEFAULT_TRANSACTION.from,
+    };
+    const signature = await signTx(tx, DEFAULT_WALLET.privateKey);
+
+    await expect(
+      isTxSignedBySender(tx, signature, DEFAULT_WALLET.publicKey),
+    ).resolves.toBe(false);
+  });
+
+  it('checks for signature mismatch', async () => {
+    const signature = await signTx({
+      ...DEFAULT_TRANSACTION,
+      value: 1000,
+    }, DEFAULT_WALLET.privateKey);
+
+    await expect(
+      isTxSignedBySender(DEFAULT_TRANSACTION, signature, DEFAULT_WALLET.publicKey),
+    ).resolves.toBe(false);
+  });
+
+  it('treats any error or missing args as invalid case', async () => {
+    const signature = await signTx(DEFAULT_TRANSACTION, DEFAULT_WALLET.privateKey);
+    await Promise.all([
+      [null, signature, DEFAULT_TRANSACTION.publicKey],
+      [DEFAULT_TRANSACTION, null, DEFAULT_TRANSACTION.publicKey],
+      [DEFAULT_TRANSACTION, signature, null],
+      [DEFAULT_TRANSACTION, signature, ''],
+    ].map((args) => expect(
+      isTxSignedBySender(...args),
+    ).resolves.toBe(false)));
   });
 });
