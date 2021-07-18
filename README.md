@@ -1,5 +1,5 @@
 # Kolecoin
-AIE Token with Proof-of-Authority consensus written in JS.
+AIE Token with Proof-of-Authority consensus.
 
 ## AIE
 - Altruistic
