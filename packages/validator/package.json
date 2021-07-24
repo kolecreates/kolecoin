@@ -1,0 +1,32 @@
+{
+  "name": "@kolecoin/validator",
+  "version": "0.0.0",
+  "description": "Validate transactions and run contract logic",
+  "author": "KoleCreates",
+  "homepage": "https://github.com/kolecreates/kolecoin#readme",
+  "license": "MIT",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.yarnpkg.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kolecreates/kolecoin.git"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "bugs": {
+    "url": "https://github.com/kolecreates/kolecoin/issues"
+  },
+  "dependencies": {
+    "@kolecoin/core": "^0.0.0"
+  }
+}

@@ -27,7 +27,7 @@ const validateTxFields = (tx) => {
     }
   }
 
-  ['value', 'fee', 'feeLimit'].forEach((field) => {
+  ['value', 'feeLimit'].forEach((field) => {
     if (tx[field] > MAXIMUM_COIN_DELTA) {
       throw new Error(MAXIMUM_VALUE_ERROR);
     }
@@ -37,7 +37,7 @@ const validateTxFields = (tx) => {
     }
   });
 
-  ['value', 'nonce', 'fee', 'feeLimit'].forEach((field) => {
+  ['value', 'nonce', 'feeLimit'].forEach((field) => {
     if (!isNumber(tx[field])) {
       throw new Error(NAN_VALUE_ERROR);
     }
@@ -67,14 +67,13 @@ const isTxSignedBySender = async (tx, sig, publicKey) => {
   }
 };
 
-const createTx = (from, to, value, nonce, data, fee, feeLimit) => {
+const createTx = (from, to, value, nonce, data, feeLimit) => {
   const tx = {
     from,
     to,
     value,
     nonce,
     data,
-    fee,
     feeLimit,
   };
   if (validateTxFields(tx)) {

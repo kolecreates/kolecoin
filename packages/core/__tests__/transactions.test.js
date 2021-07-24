@@ -27,7 +27,7 @@ describe('validateTxFields', () => {
   });
 
   it('tests coin fields against maximum', () => {
-    ['value', 'fee', 'feeLimit'].forEach((field) => {
+    ['value', 'feeLimit'].forEach((field) => {
       expect(() => validateTxFields({
         ...DEFAULT_TRANSACTION,
         [field]: MAXIMUM_COIN_DELTA + 1,
@@ -35,7 +35,7 @@ describe('validateTxFields', () => {
     });
   });
   it('tests coin fields against minimum', () => {
-    ['value', 'fee', 'feeLimit'].forEach((field) => {
+    ['value', 'feeLimit'].forEach((field) => {
       expect(() => validateTxFields({
         ...DEFAULT_TRANSACTION,
         [field]: MINIMUM_COIN_DELTA / 10,
@@ -44,7 +44,7 @@ describe('validateTxFields', () => {
   });
 
   it('type checks numerical fields', () => {
-    ['value', 'nonce', 'fee', 'feeLimit'].forEach((field) => {
+    ['value', 'nonce', 'feeLimit'].forEach((field) => {
       expect(() => validateTxFields({
         ...DEFAULT_TRANSACTION,
         [field]: DEFAULT_TRANSACTION[field].toString(),
