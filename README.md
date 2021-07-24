@@ -24,14 +24,15 @@ Stores the buyer, sellers, and payment receivers address (e.g. artist might want
 Stores data about the assets such as URL to a related art piece
 #### Validation Node
 Validate transactions and run contract logic for a fee, update the network state
-can only validate non-consecutive blocks
+can only validate non-consecutive blocks. The round-robin order is decided by selecting the validator with the public key that 
+is closest to the previous block signature when sorted alpha-numerically.
 #### Wallets
 public/private key pair can be created on the website or by any other client
 #### Peer to Peer
 ledger nodes, validators, contracts, and users communicate via a custom protocol over websockets relayed by relay nodes.
 #### Validator Election
 - Validators are authorized by Kole
-- They have a certificate of authority signed by the root cert.
+- They have a proof of authority which is their public key signed by the root private key.
 
 
 ## Modules
