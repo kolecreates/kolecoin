@@ -1,8 +1,8 @@
 const {
-  MAXIMUM_COIN_VALUE,
+  MAXIMUM_COIN_DELTA,
   MAXIMUM_VALUE_ERROR,
   MINUMUM_VALUE_ERROR,
-  MINIMUM_COIN_VALUE,
+  MINIMUM_COIN_DELTA,
   NAN_VALUE_ERROR,
   INVALID_ADDRESS_ERROR,
   TX_DATA_MISSING_ERROR,
@@ -28,11 +28,11 @@ const validateTxFields = (tx) => {
   }
 
   ['value', 'fee', 'feeLimit'].forEach((field) => {
-    if (tx[field] > MAXIMUM_COIN_VALUE) {
+    if (tx[field] > MAXIMUM_COIN_DELTA) {
       throw new Error(MAXIMUM_VALUE_ERROR);
     }
 
-    if (tx[field] < MINIMUM_COIN_VALUE) {
+    if (tx[field] < MINIMUM_COIN_DELTA) {
       throw new Error(MINUMUM_VALUE_ERROR);
     }
   });

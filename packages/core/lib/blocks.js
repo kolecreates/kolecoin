@@ -1,4 +1,5 @@
-const { MAX_NEW_BLOCK_AGE_MS, PROOF_OF_AUTH_PUBLIC_KEY } = require('./constants');
+const crypto = require('crypto');
+const { MAX_NEW_BLOCK_AGE_MS, ROOT_PUBLIC_KEY } = require('./constants');
 const { isNumber, isBalance, isFeeOrPayment } = require('./numbers');
 const { isPublicKey, isValidSignature, signString } = require('./wallets');
 
@@ -9,6 +10,8 @@ const signBlock = async (block, privateKey) => {
 };
 
 const isBlockId = (id) => typeof id === 'string' && id.length === 64;
+
+const createBlockId = () => crypto.randomBytes(32).toString('hex');
 
 const isValidLookupItem = (item) => {
   if (item.nonce !== undefined && (!isNumber(item.nonce) || item.nonce < 0)) {
@@ -85,7 +88,7 @@ const isBlockTrusted = async (block) => {
   }
 
   try {
-    if (!await isValidSignature(block.verifier, block.proofOfAuth, PROOF_OF_AUTH_PUBLIC_KEY)) {
+    if (!await isValidSignature(block.verifier, block.proofOfAuth, ROOT_PUBLIC_KEY)) {
       return false;
     }
   } catch {
@@ -100,4 +103,5 @@ module.exports = {
   isBlockDataValid,
   isBlockTrusted,
   isBlockId,
+  createBlockId,
 };

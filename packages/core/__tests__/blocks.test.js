@@ -1,6 +1,8 @@
 /* eslint-disable no-undef */
-const { isBlockDataValid, signBlock, isBlockTrusted } = require('../lib/blocks');
-const { MAX_NEW_BLOCK_AGE_MS, MAXIMUM_COIN_VALUE, MINIMUM_COIN_VALUE } = require('../lib/constants');
+const {
+  isBlockDataValid, signBlock, isBlockTrusted, isBlockId, createBlockId,
+} = require('../lib/blocks');
+const { MAX_NEW_BLOCK_AGE_MS, MAXIMUM_COIN_DELTA, MINIMUM_COIN_DELTA } = require('../lib/constants');
 const { signString } = require('../lib/wallets');
 const {
   DEFAULT_BLOCK, DEFAULT_TRANSACTION, VERIFIER_WALLET, USER_WALLET_1,
@@ -64,7 +66,7 @@ describe('isBlockDataValid', () => {
     [
       ['nonce', ['1', null, -5, {}]],
       ['balance', ['50', null, -50, {}, Infinity]],
-      ['fee', ['50', null, -50, {}, MAXIMUM_COIN_VALUE + 1, MINIMUM_COIN_VALUE / 10]],
+      ['fee', ['50', null, -50, {}, MAXIMUM_COIN_DELTA + 1, MINIMUM_COIN_DELTA / 10]],
       ['state', ['', 5, null, []]],
     ].forEach((item) => {
       const [field, args] = item;
@@ -109,5 +111,12 @@ describe('isBlockTrusted', () => {
     expect(
       await signThenCheckTrust(block),
     ).toBe(false);
+  });
+});
+
+describe('createBlockId', () => {
+  it('creates a valid id', () => {
+    const id = createBlockId();
+    expect(isBlockId(id)).toBe(true);
   });
 });

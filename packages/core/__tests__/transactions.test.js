@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 const {
-  MAXIMUM_COIN_VALUE, MINIMUM_COIN_VALUE, NAN_VALUE_ERROR,
+  MAXIMUM_COIN_DELTA, MINIMUM_COIN_DELTA, NAN_VALUE_ERROR,
   MAXIMUM_VALUE_ERROR, MINIMUM_VALUE_ERROR,
   INVALID_ADDRESS_ERROR,
   TX_DATA_MISSING_ERROR,
@@ -30,7 +30,7 @@ describe('validateTxFields', () => {
     ['value', 'fee', 'feeLimit'].forEach((field) => {
       expect(() => validateTxFields({
         ...DEFAULT_TRANSACTION,
-        [field]: MAXIMUM_COIN_VALUE + 1,
+        [field]: MAXIMUM_COIN_DELTA + 1,
       })).toThrow(MAXIMUM_VALUE_ERROR);
     });
   });
@@ -38,7 +38,7 @@ describe('validateTxFields', () => {
     ['value', 'fee', 'feeLimit'].forEach((field) => {
       expect(() => validateTxFields({
         ...DEFAULT_TRANSACTION,
-        [field]: MINIMUM_COIN_VALUE / 10,
+        [field]: MINIMUM_COIN_DELTA / 10,
       })).toThrow(MINIMUM_VALUE_ERROR);
     });
   });

@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-const { MINIMUM_COIN_VALUE, MAXIMUM_COIN_VALUE } = require('../lib/constants');
+const { MINIMUM_COIN_DELTA, MAXIMUM_COIN_DELTA } = require('../lib/constants');
 const { isNumber, isBalance, isFeeOrPayment } = require('../lib/numbers');
 
 describe('isNumber', () => {
@@ -31,13 +31,13 @@ describe('isBalance', () => {
 
 describe('isFeeOrPayment', () => {
   it('returns true if valid', () => {
-    [MINIMUM_COIN_VALUE, 1.3, 3.1, 5.5, 10, 20, 1000, MAXIMUM_COIN_VALUE].forEach((val) => {
+    [MINIMUM_COIN_DELTA, 1.3, 3.1, 5.5, 10, 20, 1000, MAXIMUM_COIN_DELTA].forEach((val) => {
       expect(isFeeOrPayment(val)).toBe(true);
     });
   });
 
   it('returns false', () => {
-    ['0', -1, MINIMUM_COIN_VALUE / 10, null, undefined, MAXIMUM_COIN_VALUE + 1, Infinity, -Infinity, {}, Number.NaN].forEach((val) => {
+    ['0', -1, MINIMUM_COIN_DELTA / 10, null, undefined, MAXIMUM_COIN_DELTA + 1, Infinity, -Infinity, {}, Number.NaN].forEach((val) => {
       expect(isFeeOrPayment(val)).toBe(false);
     });
   });
