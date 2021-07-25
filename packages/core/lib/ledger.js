@@ -6,6 +6,8 @@ const {
   isPlainObject,
 } = require('./objects');
 
+const isLedger = (ledger) => isPlainObject(ledger) && isPlainObject(ledger.blocks);
+
 const createLedger = () => ({
   blocks: {
     [ROOT_BLOCK.id]: ROOT_BLOCK,
@@ -14,7 +16,7 @@ const createLedger = () => ({
 });
 
 const addBlock = (ledger, block) => {
-  if (!isPlainObject(ledger) || !isPlainObject(ledger.blocks)) {
+  if (!isLedger(ledger)) {
     throw new Error(LEDGER_INVALID_ERROR);
   }
   if (ledger.blocks[block.id]) {
@@ -41,7 +43,7 @@ const addBlock = (ledger, block) => {
 };
 
 const getBlock = (ledger, blockId) => {
-  if (!isPlainObject(ledger) || !isPlainObject(ledger.blocks)) {
+  if (!isLedger(ledger)) {
     return null;
   }
 
@@ -49,7 +51,7 @@ const getBlock = (ledger, blockId) => {
 };
 
 const getLatestBlock = (ledger) => {
-  if (!isPlainObject(ledger) || !isPlainObject(ledger.blocks)) {
+  if (!isLedger(ledger)) {
     throw new Error(LEDGER_INVALID_ERROR);
   }
 
@@ -57,7 +59,7 @@ const getLatestBlock = (ledger) => {
 };
 
 const iterateBlocks = (ledger, callback) => {
-  if (!isPlainObject(ledger) || !isPlainObject(ledger.blocks)) {
+  if (!isLedger(ledger)) {
     throw new Error(LEDGER_INVALID_ERROR);
   }
   let current = ledger.blocks[ledger.latestId];
@@ -92,4 +94,5 @@ module.exports = {
   getLatestBlock,
   iterateBlocks,
   findLatestLookupFieldValue,
+  isLedger,
 };

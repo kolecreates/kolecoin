@@ -37,4 +37,5 @@ module.exports = {
     verifier: ROOT_PUBLIC_KEY,
     proofOfAuth: '',
   },
+  BASE_TX_FEE: 0.01,
 };

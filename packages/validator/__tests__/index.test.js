@@ -2,10 +2,10 @@
 const { FROM_ROOT_TO_USER_1, FROM_ROOT_TO_USER_2, VERIFIER_WALLET } = require('@kolecoin/core/__mocks__/data');
 const { createLedger } = require('@kolecoin/core/lib/ledger');
 const blockUtils = require('@kolecoin/core/lib/blocks');
-const { ROOT_BLOCK, TOTAL_COIN_SUPPLY } = require('@kolecoin/core/lib/constants');
-const { txPoolToBlock } = require('../lib/index');
 
 const createBlockIdSpy = jest.spyOn(blockUtils, 'createBlockId');
+const { ROOT_BLOCK, TOTAL_COIN_SUPPLY, BASE_TX_FEE } = require('@kolecoin/core/lib/constants');
+const { txPoolToBlock } = require('../lib/index');
 
 const nowSpy = jest.spyOn(Date, 'now');
 
@@ -40,13 +40,14 @@ describe('txPoolToBlock', () => {
             balance: FROM_ROOT_TO_USER_2.value,
           },
           [FROM_ROOT_TO_USER_1.from]: {
+            nonce: 1,
             balance: TOTAL_COIN_SUPPLY
                 - FROM_ROOT_TO_USER_1.value
                 - FROM_ROOT_TO_USER_2.value
-                - 0.2,
+                - (BASE_TX_FEE * 2),
             fees: [
-              0.1,
-              0.1,
+              BASE_TX_FEE,
+              BASE_TX_FEE,
             ],
           },
         },

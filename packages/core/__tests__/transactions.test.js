@@ -53,9 +53,9 @@ describe('validateTxFields', () => {
   });
 
   it('tests format of addresses', () => {
-    ['to', 'from'].forEach((field) => {
+    ['from'].forEach((field) => {
       expect(() => validateTxFields({
-        ...CONTRACT_CREATE_TX,
+        ...DEFAULT_TRANSACTION,
         [field]: '123456',
       })).toThrow(INVALID_ADDRESS_ERROR);
     });
@@ -64,6 +64,11 @@ describe('validateTxFields', () => {
   it('expects data to be provided if no to address', () => {
     expect(() => validateTxFields({ ...DEFAULT_TRANSACTION, to: undefined, data: undefined }))
       .toThrow(TX_DATA_MISSING_ERROR);
+  });
+
+  it('allows to address to be null if contract data', () => {
+    expect(() => validateTxFields({ ...CONTRACT_CREATE_TX, to: undefined }))
+      .not.toThrow(TX_DATA_MISSING_ERROR);
   });
 
   it('validates data', () => {

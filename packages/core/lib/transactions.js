@@ -20,9 +20,7 @@ const validateTxFields = (tx) => {
   }
 
   if (!isPublicKey(tx.to)) {
-    if (tx.data) {
-      throw new Error(INVALID_ADDRESS_ERROR);
-    } else {
+    if (!tx.data) {
       throw new Error(TX_DATA_MISSING_ERROR);
     }
   }

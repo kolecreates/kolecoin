@@ -90,7 +90,7 @@ const DEFAULT_BLOCK = {
   lookup: {
     [DEFAULT_TRANSACTION.from]: {
       nonce: DEFAULT_TRANSACTION.nonce,
-      fee: 0.1,
+      fees: [0.1],
       balance: 0,
     },
     [DEFAULT_TRANSACTION.to]: {
