@@ -72,6 +72,7 @@ const CONTRACT_CREATE_TX = {
                   commands.setState('owner', commands.getInvoke('from')),
                   commands.accept(),
                 ],
+                commands.reject(),
               ),
             ),
           ],

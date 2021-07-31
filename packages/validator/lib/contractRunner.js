@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable max-classes-per-file */
 const { CONTRACT_COMMAND_FEE } = require('@kolecoin/core/lib/constants');
+const { isFeeOrPayment } = require('@kolecoin/core/lib/numbers');
 const { isPlainObject } = require('@kolecoin/core/lib/objects');
 
 const isCallable = (a) => typeof a === 'function';
@@ -14,8 +15,18 @@ class ContractRuntime {
     this.rejected = false;
   }
 
+  addToFee(value = CONTRACT_COMMAND_FEE) {
+    if (isFeeOrPayment(value)) {
+      if (this.fee + value > this.invokeTx.feeLimit) {
+        throw new Error('feeLimit exceeded');
+      } else {
+        this.fee += value;
+      }
+    }
+  }
+
   ifEqual(a, b, ifCase, elseCase) {
-    this.fee += CONTRACT_COMMAND_FEE;
+    this.addToFee();
     if (a === b) {
       if (isCallable(ifCase)) return ifCase();
     } else if (isCallable(elseCase)) return elseCase();
@@ -24,7 +35,7 @@ class ContractRuntime {
   }
 
   ifGTE(a, b, ifCase, elseCase) {
-    this.fee += CONTRACT_COMMAND_FEE;
+    this.addToFee();
     if (a >= b) {
       if (isCallable(ifCase)) return ifCase();
     } else if (isCallable(elseCase)) return elseCase();
@@ -33,33 +44,39 @@ class ContractRuntime {
   }
 
   getState(field) {
-    this.fee += CONTRACT_COMMAND_FEE;
+    this.addToFee();
     return this.state[field];
   }
 
   setState(field, value) {
-    this.fee += CONTRACT_COMMAND_FEE;
+    this.addToFee();
     this.state[field] = value;
     return value;
   }
 
   getInvoke(field) {
-    this.fee += CONTRACT_COMMAND_FEE;
+    this.addToFee();
     return this.invokeTx[field];
   }
 
   accept() {
-    this.fee += CONTRACT_COMMAND_FEE;
+    this.addToFee();
     this.accepted = true;
   }
 
   reject() {
-    this.fee += CONTRACT_COMMAND_FEE;
+    this.addToFee();
     this.rejected = true;
   }
 }
 
 class ContractRunner {
+  static run(logic, state, invoke) {
+    const runner = new ContractRunner(logic, state, invoke);
+
+    return runner.run();
+  }
+
   constructor(logic, initState, invokeTx) {
     this.logic = logic;
     this.initState = initState;
@@ -88,12 +105,29 @@ class ContractRunner {
   }
 
   run() {
-    this.runtime = new ContractRuntime(this.initState, this.invokeTx);
-    for (let i = 0; i < this.logic.length; i += 1) {
-      const line = this.logic[i];
-      this.execLine(line);
+    try {
+      this.runtime = new ContractRuntime(this.initState, this.invokeTx);
+      for (let i = 0; i < this.logic.length; i += 1) {
+        const line = this.logic[i];
+        this.execLine(line);
+      }
+      return {
+        state: this.runtime.state,
+        fee: this.runtime.fee,
+        txs: this.runtime.txs,
+        accepted: this.runtime.accepted,
+        rejected: this.runtime.rejected,
+      };
+    } catch (e) {
+      return {
+        state: this.initState,
+        fee: this.runtime.fee,
+        txs: [],
+        accepted: false,
+        rejected: true,
+        error: e,
+      };
     }
-    return { state: this.runtime.state, fee: this.runtime.fee, txs: this.runtime.txs };
   }
 }
 

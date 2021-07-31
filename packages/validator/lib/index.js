@@ -1,7 +1,7 @@
 const { createBlockId } = require('@kolecoin/core/lib/blocks');
 const { findLatestLookupFieldValue } = require('@kolecoin/core/lib/ledger');
 const { BASE_TX_FEE } = require('@kolecoin/core/lib/constants');
-const { isPlainObject } = require('@kolecoin/core/lib/objects');
+const { createContractAddress } = require('@kolecoin/core/lib/contracts');
 const ContractRunner = require('./contractRunner');
 
 const calculateFee = (tx) => {
@@ -62,6 +62,13 @@ const txPoolToBlock = (ledger, pool, verifier, proofOfAuth) => {
       if (toItem) {
         toItem.balance += tx.value;
         lookup[tx.to] = toItem;
+      } else if (!tx.to && tx.data && tx.data.create) {
+        const contractAddr = createContractAddress(tx.from, tx.nonce);
+        lookup[contractAddr] = {
+          state: tx.data.create.state,
+          functions: tx.data.create.functions,
+          balance: tx.value,
+        };
       }
       txs.push(tx);
     }
@@ -78,13 +85,6 @@ const txPoolToBlock = (ledger, pool, verifier, proofOfAuth) => {
   };
 };
 
-const runContract = (logic, state, invoke) => {
-  const runner = new ContractRunner(logic, state, invoke);
-
-  return runner.run();
-};
-
 module.exports = {
   txPoolToBlock,
-  runContract,
 };

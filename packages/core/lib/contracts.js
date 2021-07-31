@@ -37,7 +37,7 @@ const isContractData = (data) => {
 
 const createContractAddress = (publicKey, nonce) => crypto.createHash('sha256')
   .update(publicKey + nonce)
-  .digest();
+  .digest('hex');
 
 const commands = {
   ifEqual: (a, b, ifCase, elseCase) => ({ $command: 'ifEqual', $params: [a, b], $callbacks: [ifCase, elseCase] }),

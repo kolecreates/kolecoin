@@ -5,17 +5,15 @@ const {
   VERIFIER_WALLET,
   USER_WALLET_1,
   USER_WALLET_2,
-  CONTRACT_CREATE_TX,
-  CONTRACT_INVOKE_TX,
 } = require('@kolecoin/core/__mocks__/data');
 const { createLedger } = require('@kolecoin/core/lib/ledger');
 const blockUtils = require('@kolecoin/core/lib/blocks');
 
 const createBlockIdSpy = jest.spyOn(blockUtils, 'createBlockId');
 const {
-  ROOT_BLOCK, TOTAL_COIN_SUPPLY, BASE_TX_FEE, CONTRACT_COMMAND_FEE,
+  ROOT_BLOCK, TOTAL_COIN_SUPPLY, BASE_TX_FEE,
 } = require('@kolecoin/core/lib/constants');
-const { txPoolToBlock, runContract } = require('../lib/index');
+const { txPoolToBlock } = require('../lib/index');
 
 const nowSpy = jest.spyOn(Date, 'now');
 const id = createBlockIdSpy();
@@ -223,25 +221,5 @@ describe('txPoolToBlock', () => {
         },
       },
     );
-  });
-});
-
-describe('runContract', () => {
-  it('should run', () => {
-    const { state, txs, fee } = runContract(
-      CONTRACT_CREATE_TX.data.create.functions.buyNFT.logic,
-      CONTRACT_CREATE_TX.data.create.state,
-      CONTRACT_INVOKE_TX,
-    );
-
-    expect(state).toEqual({
-      locked: true,
-      owner: CONTRACT_INVOKE_TX.from,
-      mediaUrl: 'example.com/nft_image.png',
-      buyoutPrice: 10,
-    });
-
-    expect(txs).toEqual([]);
-    expect(fee).toEqual(CONTRACT_COMMAND_FEE * 9);
   });
 });
