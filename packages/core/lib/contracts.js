@@ -39,7 +39,18 @@ const createContractAddress = (publicKey, nonce) => crypto.createHash('sha256')
   .update(publicKey + nonce)
   .digest();
 
+const commands = {
+  ifEqual: (a, b, ifCase, elseCase) => ({ $command: 'ifEqual', $params: [a, b], $callbacks: [ifCase, elseCase] }),
+  ifGTE: (a, b, ifCase, elseCase) => ({ $command: 'ifGTE', $params: [a, b], $callbacks: [ifCase, elseCase] }),
+  getState: (key) => ({ $command: 'getState', $params: [key], $callbacks: [] }),
+  setState: (key, value) => ({ $command: 'setState', $params: [key, value], $callbacks: [] }),
+  getInvoke: (key) => ({ $command: 'getInvoke', $params: [key], $callbacks: [] }),
+  accept: () => ({ $command: 'accept', $params: [], $callbacks: [] }),
+  reject: () => ({ $command: 'reject', $params: [], $callbacks: [] }),
+};
+
 module.exports = {
   isContractData,
   createContractAddress,
+  commands,
 };

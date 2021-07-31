@@ -1,4 +1,5 @@
 const { ROOT_PUBLIC_KEY } = require('../lib/constants');
+const { commands } = require('../lib/contracts');
 
 const USER_WALLET_1 = {
   privateKey: '4f463bb9dccd7feabcc17a10d2a274591f1b60fcfa5d5f2d43b7a83a3f975a41',
@@ -53,18 +54,26 @@ const CONTRACT_CREATE_TX = {
         locked: false,
         owner: null,
         mediaUrl: 'example.com/nft_image.png',
+        buyoutPrice: 10,
       },
       functions: {
         buyNFT: {
           params: {},
           logic: [
-            ['ifEqual', ['getState', 'locked'], true, ['reject']],
-            ['ifGTE', ['getTx', 'value'], ['getState', 'buyoutPrice'],
-              [
-                ['setState', ['locked', true]],
-                ['setState', ['owner', ['getTx', 'from']]],
-              ],
-            ],
+            commands.ifEqual(
+              commands.getState('locked'),
+              true,
+              commands.reject(),
+              commands.ifGTE(
+                commands.getInvoke('value'),
+                commands.getState('buyoutPrice'),
+                [
+                  commands.setState('locked', true),
+                  commands.setState('owner', commands.getInvoke('from')),
+                  commands.accept(),
+                ],
+              ),
+            ),
           ],
         },
       },
@@ -74,6 +83,8 @@ const CONTRACT_CREATE_TX = {
 
 const CONTRACT_INVOKE_TX = {
   ...DEFAULT_TRANSACTION,
+  value: CONTRACT_CREATE_TX.data.create.state.buyoutPrice,
+  feeLimit: 1,
   data: {
     invoke: {
       name: 'buyNFT',

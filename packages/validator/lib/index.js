@@ -1,6 +1,8 @@
 const { createBlockId } = require('@kolecoin/core/lib/blocks');
 const { findLatestLookupFieldValue } = require('@kolecoin/core/lib/ledger');
 const { BASE_TX_FEE } = require('@kolecoin/core/lib/constants');
+const { isPlainObject } = require('@kolecoin/core/lib/objects');
+const ContractRunner = require('./contractRunner');
 
 const calculateFee = (tx) => {
   if (!tx.data) {
@@ -76,6 +78,13 @@ const txPoolToBlock = (ledger, pool, verifier, proofOfAuth) => {
   };
 };
 
+const runContract = (logic, state, invoke) => {
+  const runner = new ContractRunner(logic, state, invoke);
+
+  return runner.run();
+};
+
 module.exports = {
   txPoolToBlock,
+  runContract,
 };

@@ -38,4 +38,5 @@ module.exports = {
     proofOfAuth: '',
   },
   BASE_TX_FEE: 0.01,
+  CONTRACT_COMMAND_FEE: 0.01,
 };
