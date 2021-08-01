@@ -71,8 +71,8 @@ class ContractRuntime {
 }
 
 class ContractRunner {
-  static run(logic, state, invoke) {
-    const runner = new ContractRunner(logic, state, invoke);
+  static run(logic, state, invokeTx) {
+    const runner = new ContractRunner(logic, state, invokeTx);
 
     return runner.run();
   }

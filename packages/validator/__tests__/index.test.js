@@ -6,6 +6,7 @@ const {
   USER_WALLET_1,
   USER_WALLET_2,
   CONTRACT_CREATE_TX,
+  CONTRACT_INVOKE_TX,
 } = require('@kolecoin/core/__mocks__/data');
 const { createLedger } = require('@kolecoin/core/lib/ledger');
 const blockUtils = require('@kolecoin/core/lib/blocks');
@@ -268,6 +269,82 @@ describe('txPoolToBlock', () => {
             balance: createContractTx.value,
             state: CONTRACT_CREATE_TX.data.create.state,
             functions: CONTRACT_CREATE_TX.data.create.functions,
+          },
+          [FROM_ROOT_TO_USER_1.from]: {
+            nonce: 0,
+            balance: TOTAL_COIN_SUPPLY
+                - FROM_ROOT_TO_USER_1.value
+                - (BASE_TX_FEE * 1),
+            fees: [
+              BASE_TX_FEE,
+            ],
+          },
+        },
+      },
+    );
+  });
+
+  it('handles contract invoke', () => {
+    createBlockIdSpy.mockReturnValueOnce(id);
+    nowSpy.mockReturnValueOnce(timestamp);
+    const createContractTx = {
+      from: USER_WALLET_1.publicKey,
+      value: 0,
+      nonce: 0,
+      data: {
+        ...CONTRACT_CREATE_TX.data,
+      },
+      feeLimit: CONTRACT_COMMAND_FEE * 10,
+    };
+    createContractTx.data.create.state.buyoutPrice = 5;
+    const contractId = 'c95a24c69cc83791ed2a5a924d89f014ac13a5c1c620a28fa8ca8a9c6801d62f';
+    const invokeTx = {
+      from: USER_WALLET_1.publicKey,
+      to: contractId,
+      value: 5,
+      nonce: 1,
+      data: {
+        ...CONTRACT_INVOKE_TX.data,
+      },
+      feeLimit: CONTRACT_COMMAND_FEE * 10,
+    };
+
+    expect(
+      txPoolToBlock(
+        createLedger(),
+        [
+          FROM_ROOT_TO_USER_1,
+          createContractTx,
+          invokeTx,
+        ],
+        VERIFIER_WALLET.publicKey,
+        VERIFIER_WALLET.proofOfAuth,
+      ),
+    ).toEqual(
+      {
+        ...BLOCK_1,
+        transactions: [
+          FROM_ROOT_TO_USER_1,
+          createContractTx,
+          invokeTx,
+        ],
+        lookup: {
+          [USER_WALLET_1.publicKey]: {
+            balance: 4.890000000000001,
+            nonce: 1,
+            fees: [
+              BASE_TX_FEE,
+              0.09999999999999999,
+            ],
+          },
+          [contractId]: {
+            state: {
+              ...CONTRACT_CREATE_TX.data.create.state,
+              locked: true,
+              owner: USER_WALLET_1.publicKey,
+            },
+            functions: CONTRACT_CREATE_TX.data.create.functions,
+            balance: invokeTx.value,
           },
           [FROM_ROOT_TO_USER_1.from]: {
             nonce: 0,
