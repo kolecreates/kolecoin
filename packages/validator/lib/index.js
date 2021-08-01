@@ -4,14 +4,6 @@ const { BASE_TX_FEE } = require('@kolecoin/core/lib/constants');
 const { createContractAddress } = require('@kolecoin/core/lib/contracts');
 const ContractRunner = require('./contractRunner');
 
-const calculateFee = (tx) => {
-  if (!tx.data) {
-    return BASE_TX_FEE;
-  }
-
-  return 0;
-};
-
 const txPoolToBlock = (ledger, pool, verifier, proofOfAuth) => {
   if (!Array.isArray(pool)) {
     throw new Error('Invalid tx pool.');
@@ -50,7 +42,7 @@ const txPoolToBlock = (ledger, pool, verifier, proofOfAuth) => {
     if (
       fromItem.balance >= tx.value + tx.feeLimit
     ) {
-      const fee = calculateFee(tx);
+      const fee = BASE_TX_FEE;
       fromItem.balance -= tx.value + fee;
       if (!fromItem.fees) {
         fromItem.fees = [fee];
